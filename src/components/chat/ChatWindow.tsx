@@ -24,9 +24,9 @@ const ChatWindow: React.FC = () => {
   // const TRAIN_API_URL = "https://sruf3spkgj.us-east-1.awsapprunner.com/train";
   // const UPLOAD_URL = 'https://sruf3spkgj.us-east-1.awsapprunner.com/upload';
 
-  const API_URL = "http://54.224.75.56:8080/chat";
-  const TRAIN_API_URL = "http://54.224.75.56:8080/train";
-  const UPLOAD_URL = 'http://54.224.75.56:8080/upload';
+  const API_URL = "http://3.149.70.213:8000/api/chat";
+  const TRAIN_API_URL = "http://3.149.70.213:8000/api/train";
+  const UPLOAD_URL = 'http://3.149.70.213:8000/api/upload';
 
   const [messages, setMessages] = useState<MessageInterface[]>([]);
   const [snackbarSetting, setSnackBarSetting] = useState<SnackBarInterface>({ open: false, message: "" });
