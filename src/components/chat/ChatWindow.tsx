@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { CircularProgress, Input, TextField, Button, Container } from '@mui/material';
 import { FileUploader } from "react-drag-drop-files";
 import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 import ChatInput from "./ChatInput";
 import ChatMessage from "./ChatMessage";
@@ -15,6 +15,11 @@ interface MessageInterface {
 interface SnackBarInterface {
   open: boolean;
   message: string;
+}
+
+interface ApiResponse {
+  status: string;
+  message?: string;
 }
 
 const fileTypes = ["CSV", "PDF", "DOCX", "TXT"];
@@ -44,7 +49,7 @@ const ChatWindow: React.FC = () => {
   }, [messages]);
 
   const handleSendMessage = async (message: MessageInterface) => {
-    setMessages((prevMessages) => [...prevMessages, message]);
+    setMessages((prevMessages: MessageInterface[]) => [...prevMessages, message]);
     setLoading(true);
 
     try {
@@ -80,7 +85,7 @@ const ChatWindow: React.FC = () => {
             const data = line.slice(6);
             newMessageContent += data;
 
-            setMessages((prev) => {
+            setMessages((prev: MessageInterface[]) => {
               const newMessages = [...prev];
               const lastMessageIndex = newMessages.length - 1;
 
@@ -102,7 +107,7 @@ const ChatWindow: React.FC = () => {
         "Chat Error:",
         error instanceof Error ? error.message : error
       );
-      setMessages((prev) => {
+      setMessages((prev: MessageInterface[]) => {
         const newMessages = [...prev];
         const lastMessageIndex = newMessages.length - 1;
         if (
@@ -127,17 +132,19 @@ const ChatWindow: React.FC = () => {
   const handleTrain = async () => {
     setLoading(true);
     try {
-      const response = await axios.post(TRAIN_API_URL, { name });
+      const response = await axios.post<ApiResponse>(TRAIN_API_URL, { name });
       if (response.data.status !== 'Error') {
-        setLoading(false);
         setSnackBarSetting({ open: true, message: "Train successful!" });
       } else {
-        setLoading(false);
         setSnackBarSetting({ open: true, message: "Train Error!" });
       }
     } catch (error) {
+      const errorMessage = error instanceof AxiosError 
+        ? error.response?.data?.message || "Server Error!"
+        : "Server Error!";
+      setSnackBarSetting({ open: true, message: errorMessage });
+    } finally {
       setLoading(false);
-      setSnackBarSetting({ open: true, message: "Server Error!" });
     }
   };
 
@@ -155,7 +162,7 @@ const ChatWindow: React.FC = () => {
 
   const handleUpload = async () => {
     if (!file) {
-      alert("Please select a file first");
+      setSnackBarSetting({ open: true, message: "Please select a file first" });
       return;
     }
 
@@ -163,17 +170,19 @@ const ChatWindow: React.FC = () => {
     formData.append("file", file);
     formData.append("path", path);
 
-    console.log(path);
     setLoading(true);
     try {
-      const response = await axios.post(UPLOAD_URL, formData, {
+      const response = await axios.post<ApiResponse>(UPLOAD_URL, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-      setSnackBarSetting({ open: true, message: 'Train successful!' });
+      setSnackBarSetting({ open: true, message: 'Upload successful!' });
     } catch (error) {
-      setSnackBarSetting({ open: true, message: 'There was an error uploading your file.' });
+      const errorMessage = error instanceof AxiosError 
+        ? error.response?.data?.message || "Upload Error!"
+        : "Upload Error!";
+      setSnackBarSetting({ open: true, message: errorMessage });
     } finally {
       setLoading(false);
     }
@@ -186,8 +195,15 @@ const ChatWindow: React.FC = () => {
     if (reason === 'clickaway') {
       return;
     }
-
     setSnackBarSetting({ open: false, message: "" });
+  };
+
+  const handlePathChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPath(e.target.value);
+  };
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value);
   };
 
   return (
@@ -202,7 +218,7 @@ const ChatWindow: React.FC = () => {
             variant="outlined"
             style={{ width: '100%' }}
             fullWidth
-            onChange={(e) => setPath(e.target.value)}
+            onChange={handlePathChange}
           />
           <Button variant="contained" color="primary" onClick={handleUpload} style={{ width: '100%' }}>
             Upload & train
@@ -216,7 +232,7 @@ const ChatWindow: React.FC = () => {
             variant="outlined"
             style={{ width: '100%' }}
             fullWidth
-            onChange={(e) => setName(e.target.value)}
+            onChange={handleNameChange}
           />
           <Button
             variant="contained"
@@ -246,26 +262,24 @@ const ChatWindow: React.FC = () => {
           }}
           ref={containerRef}
         >
-          {messages.map((message, index) => (
+          {messages.map((message: MessageInterface, index: number) => (
             <ChatMessage key={index} {...message} />
           ))}
           <ChatInput onSendMessage={handleSendMessage} />
         </div>
       </div>
-      {
-        loading && (
-          <div
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-            }}
-          >
-            <CircularProgress />
-          </div>
-        )
-      }
+      {loading && (
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+          }}
+        >
+          <CircularProgress />
+        </div>
+      )}
     </div>
   );
 };
