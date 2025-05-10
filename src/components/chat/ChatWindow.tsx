@@ -25,13 +25,13 @@ interface ApiResponse {
 const fileTypes = ["CSV", "PDF", "DOCX", "TXT"];
 
 const ChatWindow: React.FC = () => {
-  // const API_URL = "https://sruf3spkgj.us-east-1.awsapprunner.com/chat";
-  // const TRAIN_API_URL = "https://sruf3spkgj.us-east-1.awsapprunner.com/train";
-  // const UPLOAD_URL = 'https://sruf3spkgj.us-east-1.awsapprunner.com/upload';
+  const API_URL = "https://gipqpxq24w.us-east-2.awsapprunner.com/api/chat";
+  const TRAIN_API_URL = "https://gipqpxq24w.us-east-2.awsapprunner.com/api/train";
+  const UPLOAD_URL = 'https://gipqpxq24w.us-east-2.awsapprunner.com/api/upload';
 
-  const API_URL = "http://3.149.70.213:8000/api/chat";
-  const TRAIN_API_URL = "http://3.149.70.213:8000/api/train";
-  const UPLOAD_URL = 'http://3.149.70.213:8000/api/upload';
+  // const API_URL = "http://3.149.70.213:8000/api/chat";
+  // const TRAIN_API_URL = "http://3.149.70.213:8000/api/train";
+  // const UPLOAD_URL = 'http://3.149.70.213:8000/api/upload';
 
   const [messages, setMessages] = useState<MessageInterface[]>([]);
   const [snackbarSetting, setSnackBarSetting] = useState<SnackBarInterface>({ open: false, message: "" });
