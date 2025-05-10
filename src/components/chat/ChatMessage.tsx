@@ -1,5 +1,5 @@
 import React from "react";
-import { Typography, Paper, Box } from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
 
 interface ChatMessageProps {
   content: string;
@@ -7,31 +7,29 @@ interface ChatMessageProps {
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ content, role }) => {
-  const isRequest = role === "user";
+  const isUser = role === "user";
 
   return (
     <Box
       sx={{
         display: "flex",
-        justifyContent: isRequest ? "flex-end" : "flex-start",
-        mb: 1,
+        justifyContent: isUser ? "flex-end" : "flex-start",
+        mb: 2,
       }}
     >
       <Paper
+        elevation={1}
         sx={{
-          backgroundColor: isRequest ? "#2196f3" : "#e0e0e0",
-          color: isRequest ? "#fff" : "#000",
-          padding: 2,
+          p: 2,
+          maxWidth: "70%",
+          backgroundColor: isUser ? "#1976d2" : "#f5f5f5",
+          color: isUser ? "white" : "black",
           borderRadius: 2,
-          maxWidth: "100%",
-          borderTopRightRadius: isRequest ? 0 : 4,
-          borderBottomLeftRadius: isRequest ? 4 : 0,
-          wordBreak: "break-word",  // Ensures long words break to fit within the container
-          overflowWrap: "break-word", // Allows text to wrap to the next line
         }}
-        elevation={5}
       >
-        <Typography variant="body1">{content}</Typography>
+        <Typography variant="body1" sx={{ whiteSpace: "pre-wrap" }}>
+          {content}
+        </Typography>
       </Paper>
     </Box>
   );

@@ -1,66 +1,52 @@
-import { Button, TextField } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import { TextField, Button, Box } from '@mui/material';
 
 interface ChatInputProps {
-  onSendMessage: (message: {
-    content: string;
-    role: "user" | "assistant";
-  }) => void;
+  onSendMessage: (message: { content: string; role: "user" | "assistant" }) => void;
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
-  const [message, setMessage] = useState<{
-    content: string;
-    role: "user" | "assistant";
-  }>({
-    content: "",
-    role: "user",
-  });
+  const [message, setMessage] = useState('');
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMessage({ ...message, content: event.target.value });
-  };
-
-  const handleSendMessage = () => {
-    onSendMessage(message);
-    setMessage({ content: "", role: "user" });
-  };
-
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter" && message.content.length > 0) {
-      handleSendMessage();
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (message.trim()) {
+      onSendMessage({ content: message.trim(), role: "user" });
+      setMessage('');
     }
   };
 
   return (
-    <div
-      style={{
-        position: "absolute",
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      sx={{
+        display: 'flex',
+        gap: 2,
+        padding: 2,
+        position: 'sticky',
         bottom: 0,
-        left: 0,
-        right: 0,
-        padding: "20px",
+        backgroundColor: 'white',
+        borderTop: '1px solid rgba(0, 0, 0, 0.1)',
       }}
     >
       <TextField
-        label="Enter your message"
-        variant="outlined"
-        style={{ marginBottom: "20px" }}
         fullWidth
-        value={message.content}
-        onChange={handleInputChange}
-        onKeyDown={handleKeyPress}
+        variant="outlined"
+        placeholder="Type your message..."
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        size="small"
       />
       <Button
+        type="submit"
         variant="contained"
         color="primary"
-        disabled={message.content.length === 0}
-        onClick={handleSendMessage}
-        fullWidth
+        disabled={!message.trim()}
       >
         Send
       </Button>
-    </div>
+    </Box>
   );
 };
 
